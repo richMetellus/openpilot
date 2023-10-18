@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from openpilot.selfdrive.car.tests.routes import routes as test_car_models_routes
 from openpilot.selfdrive.locationd.test.test_laikad import UBLOX_TEST_ROUTE, QCOM_TEST_ROUTE
-from openpilot.selfdrive.test.process_replay.test_processes import source_segments as replay_segments
+from openpilot.selfdrive.test.process_replay.test_car_processes import source_segments as replay_segments
 from openpilot.selfdrive.test.openpilotci import (DATA_CI_ACCOUNT, DATA_CI_ACCOUNT_URL, DATA_CI_CONTAINER,
                                                   get_azure_credential, get_container_sas)
 
