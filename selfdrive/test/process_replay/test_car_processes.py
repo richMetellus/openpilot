@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from openpilot.selfdrive.car.car_helpers import interface_names
 from openpilot.selfdrive.test.process_replay.process_replay import check_openpilot_enabled
-from openpilot.selfdrive.test.process_replay.test_processes import TestProcessReplayDiffBase
+from openpilot.selfdrive.test.process_replay.helpers import TestProcessReplayDiffBase
 
 
 source_segments = [

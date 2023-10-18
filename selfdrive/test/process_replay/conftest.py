@@ -1,7 +1,7 @@
 import pytest
 
 from openpilot.selfdrive.debug.auto_fingerprint import ALL_CARS
-from openpilot.selfdrive.test.process_replay.test_processes import ALL_PROCS
+from openpilot.selfdrive.test.process_replay.helpers import ALL_PROCS
 
 
 def pytest_addoption(parser: pytest.Parser):
