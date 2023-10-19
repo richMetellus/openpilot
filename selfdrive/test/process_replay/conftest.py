@@ -28,5 +28,7 @@ def process_replay_test_arguments(request):
   if hasattr(request.cls, "segment"): # check if a subclass of TestProcessReplayBase
     request.cls.tested_procs = list(set(request.config.getoption("--whitelist-procs")) - set(request.config.getoption("--blacklist-procs")))
     request.cls.tested_cars = list({c.upper() for c in set(request.config.getoption("--whitelist-cars")) - set(request.config.getoption("--blacklist-cars"))})
+    request.cls.ignore_fields = request.config.getoption("--ignore-fields")
+    request.cls.ignore_msgs = request.config.getoption("--ignore-msgs")
     request.cls.upload_only = request.config.getoption("--upload-only")
     request.cls.update_refs = request.config.getoption("--update-refs")
