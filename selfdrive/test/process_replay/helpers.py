@@ -84,6 +84,7 @@ class TestProcessReplayDiffBase(TestProcessReplayBase):
   """
   update_refs = False
   upload_only = False
+  long_diff = False
   ignore_msgs: List[str] = []
   ignore_fields: List[str] = []
 
@@ -95,6 +96,9 @@ class TestProcessReplayDiffBase(TestProcessReplayBase):
   @classmethod
   def setUpClass(cls):
     super().setUpClass(not cls.upload_only)
+
+    if cls.long_diff:
+      cls.maxDiff = None
 
     os.makedirs(os.path.dirname(FAKEDATA), exist_ok=True)
 
@@ -144,6 +148,6 @@ class TestProcessReplayDiffBase(TestProcessReplayBase):
 
     diff = compare_logs(ref_log_msgs, log_msgs, self.ignore_fields + cfg.ignore, self.ignore_msgs)
 
-    diff_short, _ = format_process_diff(diff)
+    diff_short, diff_long = format_process_diff(diff)
 
-    self.assertEqual(len(diff), 0, "\n" + diff_short)
+    self.assertEqual(len(diff), 0, "\n" + diff_long if self.long_diff else diff_short)

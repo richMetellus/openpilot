@@ -21,6 +21,8 @@ def pytest_addoption(parser: pytest.Parser):
                       help="Updates reference logs using current commit")
   parser.addoption("--upload-only", action="store_true",
                       help="Skips testing processes and uploads logs from previous test run")
+  parser.addoption("--long-diff", action="store_true",
+                      help="Outputs diff in long format")
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -32,3 +34,4 @@ def process_replay_test_arguments(request):
     request.cls.ignore_msgs = request.config.getoption("--ignore-msgs")
     request.cls.upload_only = request.config.getoption("--upload-only")
     request.cls.update_refs = request.config.getoption("--update-refs")
+    request.cls.long_diff = request.config.getoption("--long-diff")
