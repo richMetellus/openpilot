@@ -59,11 +59,9 @@ excluded_interfaces = ["mock", "tesla"]
 
 ALL_CARS = sorted({car for car, _ in segments})
 
-CAR_TO_SEGMENT = dict(segments)
-
 
 @pytest.mark.slow
-@parameterized_class(('case_name', 'segment'), [(i, CAR_TO_SEGMENT[i]) for i in ALL_CARS])
+@parameterized_class(('case_name', 'segment'), segments)
 class TestCarProcessReplay(TestProcessReplayDiffBase):
   """
   Runs a replay diff on a segment for each car.
@@ -79,7 +77,7 @@ class TestCarProcessReplay(TestProcessReplayDiffBase):
     super().setUpClass()
 
   def test_all_makes_are_tested(self):
-    if self.tested_cars != ALL_CARS:
+    if set(self.tested_cars) != set(ALL_CARS):
       raise unittest.SkipTest("skipping check because some cars were skipped via command line")
 
     # check to make sure all car brands are tested

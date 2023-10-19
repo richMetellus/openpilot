@@ -43,11 +43,8 @@ class TestProcessReplayBase(unittest.TestCase):
 
   @classmethod
   def setUpClass(cls, create_logs=True):
-    if cls.segment is None:
-      raise unittest.SkipTest("segment not provided")
-
-    if cls.tested_procs is None:
-      raise unittest.SkipTest("tested_procs not provided")
+    if "Base" in cls.__name__:
+      raise unittest.SkipTest("skipping base class")
 
     if isinstance(cls.segment, str):
       cls.log_reader = LogReader.from_bytes(get_log_data(cls.segment))
