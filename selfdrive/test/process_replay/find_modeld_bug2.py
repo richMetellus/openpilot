@@ -6,7 +6,7 @@ import sys
 import time
 from collections import defaultdict
 from typing import Any
-
+import numpy as np
 import cereal.messaging as messaging
 from openpilot.common.params import Params
 from openpilot.system.hardware import PC
@@ -21,8 +21,7 @@ from openpilot.tools.lib.helpers import save_log
 
 TEST_ROUTE = "2f4452b03ccb98f0|2022-12-03--13-45-30"
 SEGMENT = 6
-MAX_FRAMES = 100 if PC else 600
-NAV_FRAMES = 50
+MAX_FRAMES = 20
 
 NO_NAV = "NO_NAV" in os.environ
 SEND_EXTRA_INPUTS = bool(int(os.getenv("SEND_EXTRA_INPUTS", "0")))
@@ -79,7 +78,30 @@ if __name__ == "__main__":
   }
 
   # run replays
-  log_msgs1 = model_replay(lr, frs)
-  print(log_msgs1[0].modelV2.rawPredictions)
-  log_msgs2 = model_replay(lr, frs)
+  err_cnt = 0
+  cnt = 0
+  while True:
+    log_msgs1 = model_replay(lr, frs)
+    log_msgs2 = model_replay(lr, frs)
+    raw_preds_a = [np.frombuffer(x.modelV2.rawPredictions) for x in log_msgs1 if x.which() == 'modelV2']
+    raw_preds_b = [np.frombuffer(x.modelV2.rawPredictions) for x in log_msgs2 if x.which() == 'modelV2']
+    for i in range(len(raw_preds_a)):
+      try:
+        assert len(raw_preds_a[i]) > 0
+        a = raw_preds_a[i]
+        b = raw_preds_b[i]
+        equal = a == b
+        assert np.all(equal)
+        assert max(a-b) == 0
+      except Exception as e:
+        unequal_idxs = np.where(0 == equal)[0]
+        print(f'ERROR: {e}')
+        print(f'UNEQUAL IDXS: {unequal_idxs}')
+        err_cnt += 1
+    cnt += 1
+    print()
+    print()
+    print()
+    print()
+    print(f'DID {cnt} ITERATIONS with {err_cnt} errors')
 
