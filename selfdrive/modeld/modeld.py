@@ -20,6 +20,10 @@ from openpilot.selfdrive.modeld.parse_model_outputs import Parser
 from openpilot.selfdrive.modeld.fill_model_msg import fill_model_msg, fill_pose_msg, PublishState
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.selfdrive.modeld.models.commonmodel_pyx import ModelFrame, CLContext
+import logging
+logging.basicConfig(filename='/tmp/myapp.log', level=logging.DEBUG, 
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
+logger=logging.getLogger(__name__)
 
 SEND_RAW_PRED = os.getenv('SEND_RAW_PRED')
 
@@ -138,6 +142,10 @@ def main():
   meta_main = FrameMeta()
   meta_extra = FrameMeta()
 
+  raw_preds = []
+  raw_preds_prev = []
+  total_cnt = 0
+  total_err_cnt = 0
   while True:
     # Keep receiving frames until we are at least 1 frame ahead of previous extra frame
     while meta_main.timestamp_sof < meta_extra.timestamp_sof + 25000000:
@@ -187,6 +195,32 @@ def main():
     
     mt1 = time.perf_counter()
     model_output = model.run()
+    
+    raw_preds.append(np.copy(model_output['raw_pred']))
+    if len(raw_preds) == 10:
+      if len(raw_preds_prev) == len(raw_preds):
+        for i in range(len(raw_preds)):
+          try:
+            assert len(raw_preds[i]) > 0
+            a = raw_preds[i]
+            b = raw_preds_prev[i]
+            equal = a == b
+            assert np.all(equal)
+            assert max(a-b) == 0
+          except Exception as e:
+            unequal_idxs = np.where(0 == equal)[0]
+            cloudlog.error(f'ERROR: {e}')
+            cloudlog.error(f'UNEQUAL IDXS: {unequal_idxs}')
+            logger.error(f'ERROR: {e}')
+            logger.error(f'UNEQUAL IDXS: {unequal_idxs}')
+            total_err_cnt += 1
+      raw_preds_prev = raw_preds
+      raw_preds = []
+      total_cnt += 1
+      cloudlog.warning(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
+      logger.error(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
+
+
     mt2 = time.perf_counter()
     model_execution_time = mt2 - mt1
 
