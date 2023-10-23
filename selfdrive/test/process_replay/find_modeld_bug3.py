@@ -8,6 +8,7 @@ import time
 from collections import defaultdict
 from typing import Any
 from itertools import zip_longest
+from tqdm import tqdm
 
 import cereal.messaging as messaging
 from cereal.visionipc import VisionIpcServer, VisionStreamType
@@ -24,8 +25,7 @@ from tools.lib.logreader import LogReader
 
 TEST_ROUTE = "4cf7a6ad03080c90|2021-09-29--13-46-36"
 SEGMENT = 0
-MAX_FRAMES = 10 if PC else 1300
-
+MAX_FRAMES = 600
 
 VIPC_STREAM = {"roadCameraState": VisionStreamType.VISION_STREAM_ROAD, "driverCameraState": VisionStreamType.VISION_STREAM_DRIVER,
                "wideRoadCameraState": VisionStreamType.VISION_STREAM_WIDE_ROAD}
@@ -79,7 +79,8 @@ def model_replay(lr, frs):
   cam_msgs = list(zip_longest(msgs['roadCameraState'], msgs['wideRoadCameraState']))[0]
   
   i = 0
-  while True:
+  #while True:
+  for _ in tqdm(range(600)):
     # need a pair of road/wide msgs
     if None in (cam_msgs[0], cam_msgs[1]):
       break
@@ -91,8 +92,10 @@ def model_replay(lr, frs):
       if msg.which() in VIPC_STREAM:
         msg = msg.as_builder()
         camera_state = getattr(msg, msg.which())
-        if img is None:
-          img = frs[msg.which()].get(frame_idxs[msg.which()], pix_fmt="nv12")[0]
+        
+        img = frs[msg.which()].get(i, pix_fmt="nv12")[0]
+        #if img is None:
+        #  img = frs[msg.which()].get(frame_idxs[msg.which()], pix_fmt="nv12")[0]
         frame_idxs[msg.which()] += 1
 
         # send camera state and frame
@@ -138,4 +141,5 @@ if __name__ == "__main__":
   }
 
   # run replay
-  log_msgs = model_replay(lr, frs)
+  while True:
+    log_msgs = model_replay(lr, frs)
