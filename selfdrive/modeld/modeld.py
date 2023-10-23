@@ -192,33 +192,33 @@ def main():
     vec_desire = np.zeros(ModelConstants.DESIRE_LEN, dtype=np.float32)
     if desire >= 0 and desire < ModelConstants.DESIRE_LEN:
       vec_desire[desire] = 1
-    
-    mt1 = time.perf_counter()
-    model_output = model.run()
-    
-    raw_preds.append(np.copy(model_output['raw_pred']))
-    if len(raw_preds) == 10:
-      if len(raw_preds_prev) == len(raw_preds):
-        for i in range(len(raw_preds)):
-          try:
-            assert len(raw_preds[i]) > 0
-            a = raw_preds[i]
-            b = raw_preds_prev[i]
-            equal = a == b
-            assert np.all(equal)
-            assert max(a-b) == 0
-          except Exception as e:
-            unequal_idxs = np.where(0 == equal)[0]
-            cloudlog.error(f'ERROR: {e}')
-            cloudlog.error(f'UNEQUAL IDXS: {unequal_idxs}')
-            logger.error(f'ERROR: {e}')
-            logger.error(f'UNEQUAL IDXS: {unequal_idxs}')
-            total_err_cnt += 1
-      raw_preds_prev = raw_preds
-      raw_preds = []
-      total_cnt += 1
-      cloudlog.warning(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
-      logger.error(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
+    while True:
+      mt1 = time.perf_counter()
+      model_output = model.run()
+      
+      raw_preds.append(np.copy(model_output['raw_pred']))
+      if len(raw_preds) == 10:
+        if len(raw_preds_prev) == len(raw_preds):
+          for i in range(len(raw_preds)):
+            try:
+              assert len(raw_preds[i]) > 0
+              a = raw_preds[i]
+              b = raw_preds_prev[i]
+              equal = a == b
+              assert np.all(equal)
+              assert max(a-b) == 0
+            except Exception as e:
+              unequal_idxs = np.where(0 == equal)[0]
+              cloudlog.error(f'ERROR: {e}')
+              cloudlog.error(f'UNEQUAL IDXS: {unequal_idxs}')
+              logger.error(f'ERROR: {e}')
+              logger.error(f'UNEQUAL IDXS: {unequal_idxs}')
+              total_err_cnt += 1
+        raw_preds_prev = raw_preds
+        raw_preds = []
+        total_cnt += 1
+        cloudlog.warning(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
+        logger.error(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
 
 
     mt2 = time.perf_counter()

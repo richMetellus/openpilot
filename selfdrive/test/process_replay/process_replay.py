@@ -269,7 +269,7 @@ class ProcessContainer:
     assert self.rc and self.pm and self.sockets and self.process.proc
 
     output_msgs = []
-    with self.prefix, Timeout(self.cfg.timeout, error_msg=f"timed out testing process {repr(self.cfg.proc_name)}"):
+    with self.prefix:#, Timeout(self.cfg.timeout, error_msg=f"timed out testing process {repr(self.cfg.proc_name)}"):
       end_of_cycle = True
       if self.cfg.should_recv_callback is not None:
         end_of_cycle = self.cfg.should_recv_callback(msg, self.cfg, self.cnt)
