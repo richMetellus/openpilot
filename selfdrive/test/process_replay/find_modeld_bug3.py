@@ -9,6 +9,7 @@ from collections import defaultdict
 from typing import Any
 from itertools import zip_longest
 from tqdm import tqdm
+import numpy as np
 
 import cereal.messaging as messaging
 from cereal.visionipc import VisionIpcServer, VisionStreamType
@@ -40,7 +41,7 @@ def replace_calib(msg, calib):
   return msg
 
 
-def model_replay(lr, frs):
+def model_replay(lr):
   if not PC:
     spinner = Spinner()
     spinner.update("starting model replay")
@@ -79,6 +80,7 @@ def model_replay(lr, frs):
   cam_msgs = list(zip_longest(msgs['roadCameraState'], msgs['wideRoadCameraState']))[0]
   
   i = 0
+  img = np.zeros(3493536, dtype=np.uint8)
   #while True:
   for _ in tqdm(range(600)):
   #for cam_msgs in zip_longest(msgs['roadCameraState'], msgs['wideRoadCameraState']):
@@ -96,9 +98,6 @@ def model_replay(lr, frs):
         
         #img = frs[msg.which()].get(frame_idxs[msg.which()], pix_fmt="nv12")[0]
         frame_idxs[msg.which()] += 1
-
-        if img is None:
-          img = frs[msg.which()].get(frame_idxs[msg.which()], pix_fmt="nv12")[0]
 
         # send camera state and frame
         camera_state.frameId = frame_idxs[msg.which()]
@@ -139,11 +138,7 @@ if __name__ == "__main__":
 
   # load logs
   lr = list(LogReader(get_url(TEST_ROUTE, SEGMENT)))
-  frs = {
-    'roadCameraState': FrameReader(get_url(TEST_ROUTE, SEGMENT, log_type="fcamera"), readahead=True),
-    'wideRoadCameraState': FrameReader(get_url(TEST_ROUTE, SEGMENT, log_type="ecamera"), readahead=True)
-  }
 
   # run replay
   while True:
-    log_msgs = model_replay(lr, frs)
+    log_msgs = model_replay(lr)
