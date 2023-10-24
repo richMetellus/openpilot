@@ -81,8 +81,8 @@ def model_replay(lr):
   
   i = 0
   img = np.zeros(3493536, dtype=np.uint8)
-  #while True:
-  for _ in tqdm(range(600)):
+  while True:
+  #for _ in tqdm(range(600)):
   #for cam_msgs in zip_longest(msgs['roadCameraState'], msgs['wideRoadCameraState']):
     # need a pair of road/wide msgs
     if None in (cam_msgs[0], cam_msgs[1]):
@@ -121,8 +121,8 @@ def model_replay(lr):
             log_msgs.append(messaging.recv_one(sm.sock[recv]))
             #print(log_msgs[-1])
       
-    if min(frame_idxs['roadCameraState'], frame_idxs['wideRoadCameraState']) > MAX_FRAMES:
-      break
+    #if min(frame_idxs['roadCameraState'], frame_idxs['wideRoadCameraState']) > MAX_FRAMES:
+    #  break
     i += 1
   managed_processes['modeld'].stop()
 
