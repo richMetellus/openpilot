@@ -3,12 +3,12 @@ import sys
 import pickle
 import numpy as np
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 from openpilot.selfdrive.modeld.runners import ModelRunner, Runtime
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.selfdrive.modeld.models.commonmodel_pyx import ModelFrame, CLContext
 import logging
-logging.basicConfig(filename='/tmp/myapp.log', level=logging.DEBUG, 
+logging.basicConfig(filename='/tmp/myapp.log', level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logger=logging.getLogger(__name__)
 
@@ -47,13 +47,7 @@ class ModelState:
     for k,v in self.inputs.items():
       self.model.addInput(k, v)
 
-  def slice_outputs(self, model_outputs: np.ndarray) -> Dict[str, np.ndarray]:
-    parsed_model_outputs = {k: model_outputs[np.newaxis, v] for k,v in self.output_slices.items()}
-    if SEND_RAW_PRED:
-      parsed_model_outputs['raw_pred'] = model_outputs.copy()
-    return parsed_model_outputs
-
-  def run(self,) -> Optional[Dict[str, np.ndarray]]:
+  def run(self,):
     self.cnt += 1
     if self.cnt %2 == 0:
       img_val = 100.0
@@ -94,8 +88,8 @@ def main():
       raw_preds = []
       total_cnt += 1
       print(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
-      # UNCOMMENTING THIS LINE WILL TRIGGER ERRORS
-      #ModelFrame(cl_context)
+      # COMMENTING THIS LINE WILL FIX ERRORS
+      ModelFrame(cl_context)
 
 
 if __name__ == "__main__":
