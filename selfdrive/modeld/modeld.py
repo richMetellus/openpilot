@@ -43,8 +43,6 @@ class FrameMeta:
       self.frame_id, self.timestamp_sof, self.timestamp_eof = vipc.frame_id, vipc.timestamp_sof, vipc.timestamp_eof
 
 class ModelState:
-  frame: ModelFrame
-  wide_frame: ModelFrame
   inputs: Dict[str, np.ndarray]
   output: np.ndarray
   prev_desire: np.ndarray  # for tracking the rising edge of the pulse
@@ -52,8 +50,6 @@ class ModelState:
 
   def __init__(self, context: CLContext):
     self.cnt = 0
-    self.frame = ModelFrame(context)
-    self.wide_frame = ModelFrame(context)
     self.prev_desire = np.zeros(ModelConstants.DESIRE_LEN, dtype=np.float32)
     self.inputs = {
       'desire': np.zeros(ModelConstants.DESIRE_LEN * (ModelConstants.HISTORY_BUFFER_LEN+1), dtype=np.float32),
@@ -118,7 +114,6 @@ def main():
     
     mt1 = time.perf_counter()
     model_output = model.run()
-    
     raw_preds.append(np.copy(model_output['raw_pred']))
     if len(raw_preds) == 10:
       if len(raw_preds_prev) == len(raw_preds):
@@ -142,10 +137,7 @@ def main():
       total_cnt += 1
       cloudlog.warning(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
       logger.error(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
-      if total_err_cnt ==0:
-        cl_context = CLContext()
-        model = ModelState(cl_context)
-        cloudlog.warning("models loaded, modeld starting")
+      #ModelFrame(cl_context)
 
     mt2 = time.perf_counter()
     model_execution_time = mt2 - mt1
