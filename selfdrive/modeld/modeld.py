@@ -104,16 +104,16 @@ def main():
   setproctitle("selfdrive.modeld.modeld")
   config_realtime_process(7, 54)
 
-  cl_context = CLContext()
-  model = ModelState(cl_context)
-  cloudlog.warning("models loaded, modeld starting")
 
   raw_preds = []
   raw_preds_prev = []
   total_cnt = 0
   total_err_cnt = 0
-  while True:
+  cl_context = CLContext()
+  model = ModelState(cl_context)
+  cloudlog.warning("models loaded, modeld starting")
 
+  while True:
     # TODO: path planner timeout?
     
     mt1 = time.perf_counter()
@@ -142,7 +142,10 @@ def main():
       total_cnt += 1
       cloudlog.warning(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
       logger.error(f'DID {total_cnt} ITERATIONS with {total_err_cnt} errors')
-
+      if total_err_cnt ==0:
+        cl_context = CLContext()
+        model = ModelState(cl_context)
+        cloudlog.warning("models loaded, modeld starting")
 
     mt2 = time.perf_counter()
     model_execution_time = mt2 - mt1
