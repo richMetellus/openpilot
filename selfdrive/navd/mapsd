@@ -1,4 +1,16 @@
 #!/bin/bash
+
 cd "$(dirname "$0")"
-export QT_QPA_PLATFORM=offscreen
+
+DEVICE_TYPE="$(python ../../system/hardware/get_device_type.py)"
+
+# force CPU rendering on respective platforms
+if [ "$DEVICE_TYPE" == "tici" ]; then
+  export QT_QPA_PLATFORM=eglfs
+  export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libEGL_mesa.so.0
+else
+  export QT_QPA_PLATFORM=offscreen
+  export __GLX_VENDOR_LIBRARY_NAME=mesa # for PC with libglvnd, should not effect other platforms
+fi
+
 exec ./_mapsd
