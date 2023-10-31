@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-DEVICE_TYPE="$(python ../../system/hardware/get_device_type.py)"
+DEVICE_TYPE="$(../../system/hardware/get_device_type.py)"
 
 # force CPU rendering on respective platforms
 if [ "$DEVICE_TYPE" == "tici" ]; then
