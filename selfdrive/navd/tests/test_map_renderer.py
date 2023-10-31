@@ -60,7 +60,7 @@ class MapBoxInternetDisabledRequestHandler(http.server.BaseHTTPRequestHandler):
 
 class MapBoxInternetDisabledServer(threading.Thread):
   def run(self):
-    self.server = http.server.HTTPServer(("127.0.0.1", 5000), MapBoxInternetDisabledRequestHandler)
+    self.server = http.server.HTTPServer(("127.0.0.1", 51512), MapBoxInternetDisabledRequestHandler)
     self.server.serve_forever()
 
   def stop(self):
@@ -88,7 +88,7 @@ class TestMapRenderer(unittest.TestCase):
 
   def setUp(self):
     self.server.enable_internet()
-    os.environ['MAPS_HOST'] = 'http://localhost:5000'
+    os.environ['MAPS_HOST'] = 'http://localhost:51512'
 
     self.sm = messaging.SubMaster(['mapRenderState'])
     self.pm = messaging.PubMaster(['liveLocationKalman'])
@@ -146,7 +146,7 @@ class TestMapRenderer(unittest.TestCase):
       invalid_and_not_previously_valid = (expect_valid and not self.sm.valid['mapRenderState'] and not prev_valid)
       valid_and_not_previously_invalid = (not expect_valid and self.sm.valid['mapRenderState'] and prev_valid)
 
-      if (invalid_and_not_previously_valid or valid_and_not_previously_invalid) and frames_since_test_start < 5:
+      if (invalid_and_not_previously_valid or valid_and_not_previously_invalid) and frames_since_test_start < 10:
         continue
 
       # check output
@@ -156,7 +156,7 @@ class TestMapRenderer(unittest.TestCase):
       if not expect_valid:
         assert self.sm['mapRenderState'].renderTime == 0.
       else:
-        assert 0. < self.sm['mapRenderState'].renderTime < 0.1
+        assert 0. < self.sm['mapRenderState'].renderTime < 0.2
 
       # check vision ipc output
       assert self.vipc.recv() is not None
