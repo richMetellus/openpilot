@@ -8,6 +8,7 @@ DEVICE_TYPE="$(python ../../system/hardware/get_device_type.py)"
 if [ "$DEVICE_TYPE" == "tici" ]; then
   export QT_QPA_PLATFORM=eglfs
   export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libEGL_mesa.so.0
+  export LP_NUM_THREADS=0
 else
   export QT_QPA_PLATFORM=offscreen
   export __GLX_VENDOR_LIBRARY_NAME=mesa # for PC with libglvnd, should not effect other platforms

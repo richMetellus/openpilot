@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDebug>
 
+#include "common/util.h"
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/qt/maps/map_helpers.h"
 #include "selfdrive/navd/map_renderer.h"
@@ -12,6 +13,7 @@
 int main(int argc, char *argv[]) {
   qInstallMessageHandler(swagLogMessageHandler);
   setpriority(PRIO_PROCESS, 0, -20);
+  util::set_core_affinity({6});
 
   QApplication app(argc, argv);
   std::signal(SIGINT, sigTermHandler);
