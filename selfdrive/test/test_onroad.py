@@ -31,7 +31,7 @@ PROCS = {
   "./encoderd": 17.0,
   "./camerad": 14.5,
   "./locationd": 11.0,
-  "./mapsd": 2.0,
+  "./_mapsd": 2.0,
   "selfdrive.controls.plannerd": 16.5,
   "./_ui": 18.0,
   "selfdrive.locationd.paramsd": 9.0,
